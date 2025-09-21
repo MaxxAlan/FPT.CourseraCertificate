@@ -8,54 +8,121 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            background: #f4f6f8;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        input {
-            margin: 5px;
-            padding: 8px;
-            width: 280px;
+        .box {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            word-wrap: break-word;
+        }
+
+        .box.show {
+            opacity: 1;
+        }
+
+        input,
+        button {
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 8px 12px;
-            margin-top: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        iframe {
+            margin-top: 12px;
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 400px;
+            border-radius: 6px;
         }
 
         .hidden {
             display: none;
         }
 
-        #certificate {
-            margin-top: 20px;
+        /* Spinner */
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin: 30px auto;
+            animation: spin 1s linear infinite;
         }
 
-        iframe {
-            margin-top: 15px;
-            border: 1px solid #ccc;
-            width: 100%;
-            max-width: 800px;
-            height: 400px;
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Link xuống dòng gọn trong khung */
+        #certLink {
+            display: inline-block;
+            max-width: 100%;
+            word-break: break-word;
+            white-space: normal;
+            color: #007bff;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 
 <body>
-    <h2>Certificate Verification</h2>
-    <input id="username" type="text" placeholder="Email"><br>
-    <input id="password" type="password" placeholder="Mật khẩu"><br>
-    <button onclick="checkLogin()">Xem chứng chỉ</button>
+    <div class="box show" id="loginBox">
+        <h2>Certificate Verification</h2>
+        <input id="username" type="text" placeholder="Email">
+        <input id="password" type="password" placeholder="Mật khẩu">
+        <button onclick="checkLogin()">Xem chứng chỉ</button>
+    </div>
 
-    <div id="certificate" class="hidden">
+    <div class="box hidden" id="loading">
+        <div class="spinner"></div>
+        <p>Đang tải chứng chỉ...</p>
+    </div>
+
+    <div class="box hidden" id="certificate">
         <h3>Chứng chỉ của bạn:</h3>
-        <a id="certLink" href="" target="_blank">Mở chứng chỉ</a><br>
-        <iframe id="certFrame" src=""></iframe>
+        <a id="certLink" href="" target="_blank"></a><br>
+        <iframe id="certFrame"></iframe>
     </div>
 
     <script>
         let accounts = [];
-
-        // Đổi URL này sang link raw JSON thật của bạn
         const dataURL = "https://raw.githubusercontent.com/MaxxAlan/FPT.src/main/account.json";
 
         fetch(dataURL)
@@ -63,9 +130,21 @@
             .then(data => { accounts = data; })
             .catch(err => console.error("Không load được accounts.json:", err));
 
+        function fadeOut(el) {
+            el.classList.remove("show");
+            setTimeout(() => { el.classList.add("hidden"); }, 600);
+        }
+
+        function fadeIn(el) {
+            el.classList.remove("hidden");
+            setTimeout(() => { el.classList.add("show"); }, 50);
+        }
+
         function checkLogin() {
             const u = document.getElementById("username").value.trim();
             const p = document.getElementById("password").value.trim();
+            const loginBox = document.getElementById("loginBox");
+            const loading = document.getElementById("loading");
             const certDiv = document.getElementById("certificate");
             const certLink = document.getElementById("certLink");
             const certFrame = document.getElementById("certFrame");
@@ -73,16 +152,28 @@
             let acc = accounts.find(a => a.username === u && a.password === p);
 
             if (acc) {
-                certDiv.classList.remove("hidden");
-                certLink.href = acc.link;
-                certLink.textContent = acc.link;
-                certFrame.src = acc.link;
+                fadeOut(loginBox);
+                setTimeout(() => { fadeIn(loading); }, 600);
+
+                setTimeout(() => {
+                    fadeOut(loading);
+                    setTimeout(() => { fadeIn(certDiv); }, 600);
+
+                    certLink.href = acc.link;
+                    certLink.textContent = acc.link;
+                    certFrame.src = acc.link;
+
+                    certFrame.onerror = () => {
+                        certFrame.classList.add("hidden");
+                        alert("Không hiển thị được trong iframe. Hãy mở link trực tiếp.");
+                    };
+
+                }, 2000); // loading 2s
             } else {
                 alert("Sai tài khoản hoặc mật khẩu.");
             }
         }
     </script>
-
 </body>
 
 </html>
