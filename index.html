@@ -6,77 +6,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificate Checker</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
+        * {
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
         }
 
         .box {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
             word-wrap: break-word;
+        }
+
+        /* Fallback for browsers that don't support backdrop-filter */
+        @supports not ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+            .box {
+                background: rgba(255, 255, 255, 0.98);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
         }
 
         .box.show {
             opacity: 1;
+            transform: translateY(0);
         }
 
-        input,
-        button {
-            width: 100%;
-            margin: 8px 0;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        button {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        iframe {
-            margin-top: 12px;
-            border: 1px solid #ccc;
-            width: 100%;
-            height: 400px;
-            border-radius: 6px;
-        }
-
-        .hidden {
+        .box.hidden {
             display: none;
         }
 
-        /* Spinner */
+        h2,
+        h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: #fff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input.error {
+            border-color: #e74c3c;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .spinner {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #007bff;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            margin: 30px auto;
+            width: 60px;
+            height: 60px;
+            margin: 20px auto;
             animation: spin 1s linear infinite;
         }
 
@@ -90,89 +141,393 @@
             }
         }
 
-        /* Link xuống dòng gọn trong khung */
-        #certLink {
+        .loading-text {
+            color: #666;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        .cert-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .cert-link {
             display: inline-block;
-            max-width: 100%;
-            word-break: break-word;
-            white-space: normal;
-            color: #007bff;
-            margin-bottom: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding: 8px 15px;
+            background: #e8f2ff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            word-break: break-all;
+        }
+
+        .cert-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #27ae60;
+        }
+
+        .back-button {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .box {
+                padding: 20px;
+            }
+
+            iframe {
+                height: 300px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="box show" id="loginBox">
-        <h2>Certificate Verification</h2>
-        <input id="username" type="text" placeholder="Email">
-        <input id="password" type="password" placeholder="Mật khẩu">
-        <button onclick="checkLogin()">Xem chứng chỉ</button>
-    </div>
+    <div class="container">
+        <!-- Login Box -->
+        <div class="box show" id="loginBox">
+            <h2>🎓 Chứng Chỉ</h2>
 
-    <div class="box hidden" id="loading">
-        <div class="spinner"></div>
-        <p>Đang tải chứng chỉ...</p>
-    </div>
+            <div class="form-group">
+                <label for="username">Email:</label>
+                <input id="username" type="email" placeholder="Nhập email của bạn" autocomplete="username">
+            </div>
 
-    <div class="box hidden" id="certificate">
-        <h3>Chứng chỉ của bạn:</h3>
-        <a id="certLink" href="" target="_blank"></a><br>
-        <iframe id="certFrame"></iframe>
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input id="password" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password">
+            </div>
+
+            <button id="loginBtn" onclick="checkLogin()" disabled>
+                <span id="loginBtnText">Đang tải dữ liệu...</span>
+            </button>
+
+            <div id="errorContainer"></div>
+        </div>
+
+        <!-- Loading Box -->
+        <div class="box hidden" id="loadingBox">
+            <div class="spinner"></div>
+            <div class="loading-text">Đang xác thực và tải chứng chỉ...</div>
+        </div>
+
+        <!-- Certificate Box -->
+        <div class="box hidden" id="certificateBox">
+            <h3>📋 Chứng Chỉ Của Bạn</h3>
+            <div id="certificateContent"></div>
+            <button class="back-button" onclick="goBack()">Quay Lại</button>
+        </div>
     </div>
 
     <script>
         let accounts = [];
         const dataURL = "https://raw.githubusercontent.com/MaxxAlan/FPT.src/main/account.json";
 
-        fetch(dataURL)
-            .then(r => r.json())
-            .then(data => { accounts = data; })
-            .catch(err => console.error("Không load được accounts.json:", err));
+        // DOM elements
+        const loginBtn = document.getElementById("loginBtn");
+        const loginBtnText = document.getElementById("loginBtnText");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const errorContainer = document.getElementById("errorContainer");
+        const loginBox = document.getElementById("loginBox");
+        const loadingBox = document.getElementById("loadingBox");
+        const certificateBox = document.getElementById("certificateBox");
+        const certificateContent = document.getElementById("certificateContent");
 
-        function fadeOut(el) {
-            el.classList.remove("show");
-            setTimeout(() => { el.classList.add("hidden"); }, 600);
+        // Utility functions
+        function showError(message) {
+            errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            setTimeout(() => {
+                errorContainer.innerHTML = '';
+            }, 5000);
         }
 
-        function fadeIn(el) {
-            el.classList.remove("hidden");
-            setTimeout(() => { el.classList.add("show"); }, 50);
+        function showSuccess(message) {
+            errorContainer.innerHTML = `<div class="success-message">${message}</div>`;
         }
 
-        function checkLogin() {
-            const u = document.getElementById("username").value.trim();
-            const p = document.getElementById("password").value.trim();
-            const loginBox = document.getElementById("loginBox");
-            const loading = document.getElementById("loading");
-            const certDiv = document.getElementById("certificate");
-            const certLink = document.getElementById("certLink");
-            const certFrame = document.getElementById("certFrame");
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
 
-            let acc = accounts.find(a => a.username === u && a.password === p);
+        function fadeOut(element) {
+            element.classList.remove("show");
+            setTimeout(() => {
+                element.classList.add("hidden");
+            }, 500);
+        }
 
-            if (acc) {
-                fadeOut(loginBox);
-                setTimeout(() => { fadeIn(loading); }, 600);
+        function fadeIn(element) {
+            element.classList.remove("hidden");
+            setTimeout(() => {
+                element.classList.add("show");
+            }, 50);
+        }
 
-                setTimeout(() => {
-                    fadeOut(loading);
-                    setTimeout(() => { fadeIn(certDiv); }, 600);
+        function resetInputErrors() {
+            usernameInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+        }
 
-                    certLink.href = acc.link;
-                    certLink.textContent = acc.link;
-                    certFrame.src = acc.link;
+        // Load accounts data
+        async function loadAccounts() {
+            try {
+                loginBtnText.textContent = "Đang tải dữ liệu...";
 
-                    certFrame.onerror = () => {
-                        certFrame.classList.add("hidden");
-                        alert("Không hiển thị được trong iframe. Hãy mở link trực tiếp.");
-                    };
+                const response = await fetch(dataURL);
 
-                }, 2000); // loading 2s
-            } else {
-                alert("Sai tài khoản hoặc mật khẩu.");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Dữ liệu không đúng định dạng");
+                }
+
+                accounts = data;
+                loginBtn.disabled = false;
+                loginBtnText.textContent = "Xem Chứng Chỉ";
+                showSuccess("Dữ liệu đã được tải thành công!");
+
+            } catch (error) {
+                console.error("Error loading accounts:", error);
+                showError(`Không thể tải dữ liệu tài khoản: ${error.message}`);
+                loginBtnText.textContent = "Thử Lại";
+                loginBtn.disabled = false;
+                loginBtn.onclick = loadAccounts;
             }
         }
+
+        // Login validation and processing
+        function checkLogin() {
+            resetInputErrors();
+            errorContainer.innerHTML = '';
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // Validation
+            if (!username) {
+                usernameInput.classList.add('error');
+                showError("Vui lòng nhập email");
+                usernameInput.focus();
+                return;
+            }
+
+            if (!validateEmail(username)) {
+                usernameInput.classList.add('error');
+                showError("Email không đúng định dạng");
+                usernameInput.focus();
+                return;
+            }
+
+            if (!password) {
+                passwordInput.classList.add('error');
+                showError("Vui lòng nhập mật khẩu");
+                passwordInput.focus();
+                return;
+            }
+
+            if (accounts.length === 0) {
+                showError("Dữ liệu chưa được tải. Vui lòng thử lại.");
+                return;
+            }
+
+            // Find account
+            const account = accounts.find(acc =>
+                acc.username === username && acc.password === password
+            );
+
+            if (!account) {
+                usernameInput.classList.add('error');
+                passwordInput.classList.add('error');
+                showError("Email hoặc mật khẩu không đúng!");
+                return;
+            }
+
+            // Success - show certificates
+            loginBtn.disabled = true;
+            fadeOut(loginBox);
+
+            setTimeout(() => {
+                fadeIn(loadingBox);
+
+                setTimeout(() => {
+                    displayCertificates(account);
+                }, 2000);
+            }, 500);
+        }
+
+        // Display certificates
+        function displayCertificates(account) {
+            fadeOut(loadingBox);
+
+            setTimeout(() => {
+                certificateContent.innerHTML = '';
+
+                // Handle different link formats: null, string, or array
+                let links = [];
+
+                if (account.link === null || account.link === undefined) {
+                    // No certificates
+                    links = [];
+                } else if (typeof account.link === 'string') {
+                    // Single certificate
+                    links = [account.link];
+                } else if (Array.isArray(account.link)) {
+                    // Multiple certificates
+                    links = account.link.filter(link => link && typeof link === 'string');
+                }
+
+                if (links.length > 0) {
+                    links.forEach((link, index) => {
+                        const certItem = document.createElement('div');
+                        certItem.className = 'cert-item';
+
+                        // Create link element
+                        const linkElement = document.createElement('a');
+                        linkElement.href = link;
+                        linkElement.textContent = `📄 Chứng chỉ ${index + 1}`;
+                        linkElement.target = '_blank';
+                        linkElement.className = 'cert-link';
+
+                        // Create URL display
+                        const urlDisplay = document.createElement('div');
+                        urlDisplay.style.fontSize = '12px';
+                        urlDisplay.style.color = '#666';
+                        urlDisplay.style.marginBottom = '10px';
+                        urlDisplay.style.wordBreak = 'break-all';
+                        urlDisplay.textContent = link;
+
+                        // Create iframe
+                        const iframe = document.createElement('iframe');
+                        iframe.src = link;
+                        iframe.title = `Certificate ${index + 1}`;
+
+                        // Handle iframe load errors
+                        iframe.onload = () => {
+                            console.log(`Certificate ${index + 1} loaded successfully`);
+                        };
+
+                        iframe.onerror = () => {
+                            iframe.style.display = 'none';
+                            const errorMsg = document.createElement('p');
+                            errorMsg.textContent = 'Không thể tải preview. Vui lòng click link bên trên để xem chứng chỉ.';
+                            errorMsg.style.color = '#e74c3c';
+                            errorMsg.style.fontStyle = 'italic';
+                            errorMsg.style.marginTop = '10px';
+                            certItem.appendChild(errorMsg);
+                        };
+
+                        certItem.appendChild(linkElement);
+                        certItem.appendChild(urlDisplay);
+                        certItem.appendChild(iframe);
+                        certificateContent.appendChild(certItem);
+                    });
+
+                    // Add instruction
+                    const instruction = document.createElement('div');
+                    instruction.style.marginTop = '20px';
+                    instruction.style.padding = '15px';
+                    instruction.style.background = '#e8f5e8';
+                    instruction.style.borderRadius = '8px';
+                    instruction.style.fontSize = '14px';
+                    instruction.style.color = '#2d5a3d';
+                    instruction.innerHTML = `
+            <strong>💡 Hướng dẫn:</strong><br>
+            • Click vào link "📄 Chứng chỉ" để xem trên trang mới<br>
+            • Coursera certificates có thể cần thời gian để load<br>
+            • Nếu không thấy preview, hãy click vào link
+          `;
+                    certificateContent.appendChild(instruction);
+
+                } else {
+                    // No certificates found
+                    certificateContent.innerHTML = `
+            <div class="error-message">
+              <strong>😔 Không tìm thấy chứng chỉ</strong><br>
+              Tài khoản này chưa có chứng chỉ nào được liên kết.
+            </div>
+          `;
+                }
+
+                fadeIn(certificateBox);
+                loginBtn.disabled = false;
+            }, 500);
+        }
+
+        // Go back to login
+        function goBack() {
+            fadeOut(certificateBox);
+            setTimeout(() => {
+                fadeIn(loginBox);
+                // Clear form
+                usernameInput.value = '';
+                passwordInput.value = '';
+                resetInputErrors();
+                errorContainer.innerHTML = '';
+            }, 500);
+        }
+
+        // Enter key support
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !loginBox.classList.contains('hidden')) {
+                if (!loginBtn.disabled) {
+                    checkLogin();
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAccounts();
+        });
     </script>
 </body>
 
