@@ -27,6 +27,23 @@
             max-width: 600px;
         }
 
+        .certificate-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .certificate-main {
+            flex: 1;
+        }
+
+        .certificate-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
         .box {
             background: rgba(255, 255, 255, 0.95);
             -webkit-backdrop-filter: blur(10px);
@@ -149,29 +166,84 @@
 
         .cert-item {
             margin-bottom: 25px;
+            padding: 0;
+            background: none;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .cert-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .cert-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cert-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30px;
+            width: 100px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(15deg);
+        }
+
+        .cert-banner h4 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cert-banner .cert-type {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .cert-link {
-            display: inline-block;
-            color: #667eea;
+            display: block;
+            color: white;
             text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 15px;
-            padding: 8px 15px;
-            background: #e8f2ff;
-            border-radius: 5px;
+            padding: 0;
+            background: none;
+            border-radius: 0;
             transition: all 0.3s ease;
-            word-break: break-all;
+            margin: 0;
         }
 
         .cert-link:hover {
-            background: #667eea;
-            color: white;
-            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
+
+        .cert-url {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cert-preview {
+            background: white;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         iframe {
@@ -229,7 +301,7 @@
     <div class="container">
         <!-- Login Box -->
         <div class="box show" id="loginBox">
-            <h2>🎓 Chứng Chỉ</h2>
+            <h2>🎓 Xác Thực Chứng Chỉ</h2>
 
             <div class="form-group">
                 <label for="username">Email:</label>
