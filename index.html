@@ -336,8 +336,22 @@
 
     <script>
         let accounts = [];
-        const dataURL = "https://raw.githubusercontent.com/MaxxAlan/FPT_src/main/account.json";
 
+        // URL JSON tài khoản
+        const encodedDataURL = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL01heHhBbGFuL0ZQVF9zcmMvbWFpbi9hY2NvdW50Lmpzb24=";
+
+        // Giải mã Base64
+        function getDataURL() {
+            try {
+                return decodeURIComponent(escape(atob(encodedDataURL)));
+            } catch (e) {
+                console.error("Lỗi giải mã Base64:", e);
+                return null;
+            }
+        }
+
+        // Lấy URL dữ liệu
+        const dataURL = getDataURL();
         // DOM elements
         const loginBtn = document.getElementById("loginBtn");
         const loginBtnText = document.getElementById("loginBtnText");
